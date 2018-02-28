@@ -1,0 +1,240 @@
+---
+title: "MIS 381N Homework 3"
+author: "Siqi Chen (sc56839)"
+output:
+  pdf_document
+---
+
+```{r echo = FALSE}
+library(lpSolve)
+```
+
+
+# Question 1
+## 1)
+```{r, out.width = "400px", echo = FALSE, fig.align='center'}
+knitr::include_graphics("/Users/meganchen/Desktop/optimization/hw/hw3_png/q1.png")
+```
+Hence, the solution for the IP is
+\[\textbf{x} = \begin{bmatrix}
+ 2\\
+ 2\\
+\end{bmatrix}\]
+
+## 2)
+```{r}
+library(lpSolve)
+c <- c(-1,4)
+A <- matrix(c(-10,5,1,20,10,0),3,2)
+dir <- rep('<=',3)
+b <- c(22,49,5)
+s <- lp('max',c,A,dir,b,int.vec=1:2)
+print(s$solution)
+print(s$objval)
+```
+Looking at the graph, there're 8 feasible solutions.
+
+## 3)
+There are 8 branches in the tree. Hence the difference between number of branches and number of feasible solutions is zero.
+
+# Question 2
+Let the binary decision to invest in factory and warehouse in Austin and Dallas be $x_{1}$,$x_{2}$,$y_{1}$,$y_{2}$, respectively. Also, let the cash amount that's not invested (if we did not use up entire \$11M) be $z$. Then the objective is to maximize
+\[
+9x_{1} + 5x_{2} + 6y_{1} + 4y_{2} + z
+\]
+subject to the constraints
+\begin{equation*}
+  \begin{cases}
+  6x_{1} + 5x_{2} + 5y_{1} + 2y_{2} + z &\leq 11\\
+  x_{2} + y_{2} &\leq 1\\
+  x_{1} + y_{1} &\geq 1\\
+  x_{1},x_{2},y_{1},y_{2} \quad \textrm{are binary}\\
+  \end{cases}
+\end{equation*}
+
+we could use R to solve the problem, 
+```{r}
+c <- c(9,5,6,4,0)
+A <- matrix(c(6,0,-1,5,1,0,5,0,-1,2,1,0,1,0,0),3,5)
+dir <- rep('<=',3)
+b <- c(11,1,-1)
+s <- lp('max',c,A,dir,b,binary.vec = 1:4)
+print(s$solution)
+print(s$objval)
+```
+Hence, the optimal investment strategy is to build both factory and warehouse in Austin.
+
+# Question 3
+Let the binary decision to design a city as a hub be $x_{1}$,$x_{2}$,$x_{3}$,$x_{4}$,$x_{5}$,$x_{6}$,$x_{7}$,$x_{8}$,$x_{9}$,$x_{10}$,$x_{11}$,$x_{12}$. Then the objective is to minimize
+
+\[
+\sum_{i}x_{i}, \quad i = 1,...12
+\]
+
+subject to the constraints
+\begin{equation*}
+  \begin{cases}
+  x_{1} + x_{3} + x_{5} + x_{7} + x_{8} + x_{9} &\geq 1\\
+  x_{2} + x_{8} + x_{9} &\geq 1\\
+  x_{1} + x_{3} + x_{7} + x_{8} + x_{9} &\geq 1\\
+  x_{4} + x_{10} &\geq 1\\
+  x_{1} + x_{5} + x_{7} &\geq 1\\
+  x_{6} + x_{10} + x_{11} &\geq 1\\
+  x_{1} + x_{3} + x_{5} + x_{7} &\geq 1\\
+  x_{1} + x_{2} + x_{3} + x_{8} + x_{9} &\geq 1\\
+  x_{1} + x_{2} + x_{3} + x_{8} + x_{9} &\geq 1\\
+  x_{4} + x_{6} + x_{10} + x_{11} + x_{12} &\geq 1\\
+  x_{6} + x_{10} + x_{11} + x_{12} &\geq 1\\
+  x_{10} + x_{11} + x_{12} &\geq 1\\
+  \end{cases}
+\end{equation*}
+
+we could use R to solve the problem, 
+```{r}
+c <- rep(1,12)
+A <- matrix(0,12,12)
+A[1,c(1,3,5,7,8,9)] = 1 
+A[2,c(2,8,9)] = 1 
+A[3,c(1,3,7,8,9)] = 1 
+A[4,c(4,10)] = 1 
+A[5,c(1,5,7)] = 1 
+A[6,c(6,10,11)] = 1 
+A[7,c(1,3,5,7)] = 1 
+A[8,c(1,2,3,8,9)] = 1
+A[9,c(1,2,3,8,9)] = 1
+A[10,c(4,6,10,11,12)] = 1 
+A[11,c(6,10,11,12)] = 1 
+A[12,c(10,11,12)] = 1 
+dir <- rep('>=',12)
+b <- rep(1,12)
+s <- lp('min',c,A,dir,b,binary.vec = 1:12)
+print(s$solution)
+print(s$objval)
+```
+
+Hence, the minimal number of hubs to construct in order to cover all cities is 3 (ATL, NY, SLC).
+
+# Question 5
+First, we need to find all the possible cutting strategies of a 120 inch roll
+\begin{center}
+\begin{tabular}{ |c | c |c|c| }
+ \hline
+ 25 & 37 & 54 & waste \\ 
+ \hline
+ \hline
+ 4 & 0 & 0 & 20 \\ 
+ \hline
+ 3 & 1 & 0 & 8 \\
+ \hline
+ 2 & 0 & 1 & 16 \\
+ \hline
+ 1 & 2 & 0 & 21 \\
+ \hline
+ 1 & 1 & 1 & 4 \\ 
+ \hline
+ 0 & 3 & 0 & 9 \\ 
+ \hline
+ 0 & 0 & 2 & 12 \\  
+ \hline
+\end{tabular}
+\end{center}
+
+Let number of rolls for each of above 7 cutting strategies be 
+$x_{1}$,$x_{2}$,$x_{3}$,$x_{4}$,$x_{5}$,$x_{6}$,$x_{7}$. Then the objective is to minimize the total waste, which is 
+
+\[
+20x_{1} + 8x_{2} + 16x_{3} + 21x_{4} + 4x_{5} + 9x_{6} + 12x_{7}
+\]
+
+subject to the constraints
+\begin{equation*}
+  \begin{cases}
+  4x_{1}+3x_{2}+2x_{3}+x_{4}+x_{5} &\geq 233\\
+  x_{2}+2x_{4}+x_{5}+3x_{6} &\geq 148\\
+  x_{3}+x_{5}+2x_{7} &\geq 106\\
+  x_{1},x_{2},x_{3},x_{4},x_{5},x_{6},x_{7} \quad \text{are int}
+  \end{cases}
+\end{equation*}
+
+we could use R to solve for $\textbf{x}$, 
+```{r}
+c <- c(20,8,16,21,4,9,12)
+A <- matrix(c(4,0,0,3,1,0,2,0,1,1,2,0,1,1,1,0,3,0,0,0,2),3,7)
+dir <- rep('>=',3)
+b <- c(233,148,106)
+s <- lp('min',c,A,dir,b,int.vec = 1:7)
+print(s$solution)
+print(s$objval)
+```
+
+# Question 5
+First, we need to find all the possible working schedules for an individual worker
+\begin{center}
+\begin{tabular}{ |c | c |c|c|c |c|c|c| }
+ \hline
+ Sun & Mon & Tue & Wed & Thu & Fri & Sat & Cost\\ 
+ \hline
+ \hline
+ 1 & 1 & 1 & 1 & 1 & 0 & 0 & 330\\
+ \hline
+ 0 & 1 & 1 & 1 & 1 & 1 & 0 & 300\\
+ \hline
+ 0 & 0 & 1 & 1 & 1 & 1 & 1 & 330\\
+ \hline
+ 1 & 0 & 0 & 1 & 1 & 1 & 1 & 360\\
+ \hline
+ 1 & 1 & 0 & 0 & 1 & 1 & 1 & 360\\
+ \hline
+ 1 & 1 & 1 & 0 & 0 & 1 & 1 & 360\\
+ \hline
+ 1 & 1 & 1 & 1 & 0 & 0 & 1 & 360\\
+ \hline
+\end{tabular}
+\end{center}
+
+Let number of workers for each of above 7 working shedules be 
+$x_{1}$,$x_{2}$,$x_{3}$,$x_{4}$,$x_{5}$,$x_{6}$,$x_{7}$. Then the objective is to minimize the total cost, which is 
+
+\[
+\sum_{i}x_{i}, \quad i=1,...,7
+\]
+
+subject to the constraints
+\begin{equation*}
+  \begin{cases}
+  x_{1}+x_{4}+x_{5}+x_{6}+x_{7} &\geq 5\\
+  x_{1}+x_{2}+x_{5}+x_{6}+x_{7} &\geq 13\\
+  x_{1}+x_{2}+x_{3}+x_{6}+x_{7} &\geq 12\\
+  x_{1}+x_{2}+x_{3}+x_{4}+x_{7} &\geq 10\\
+  x_{1}+x_{2}+x_{3}+x_{4}+x_{5} &\geq 14\\
+  x_{2}+x_{3}+x_{4}+x_{5}+x_{6} &\geq 8\\
+  x_{3}+x_{4}+x_{5}+x_{6}+x_{7} &\geq 6\\
+  x_{1},x_{2},x_{3},x_{4},x_{5},x_{6},x_{7} \quad \text{are int}
+  \end{cases}
+\end{equation*}
+
+we could use R to solve for $\textbf{x}$, 
+```{r}
+c <- c(330,300,330,360,360,360,360)
+A <- matrix(c(1,1,1,1,1,0,0,
+              0,1,1,1,1,1,0,
+              0,0,1,1,1,1,1,
+              1,0,0,1,1,1,1,
+              1,1,0,0,1,1,1,
+              1,1,1,0,0,1,1,
+              1,1,1,1,0,0,1),7,7)
+dir <- rep('>=',7)
+b <- c(5,13,12,10,14,8,6)
+s <- lp('min',c,A,dir,b,int.vec = 1:7)
+print(s$solution)
+print(s$objval)
+```
+
+Hence, to minimize cost, the company should schedule one worker to work from Sunday to Thursday, eight workers to work from Monday to Friday, two workers to work from Tuesday to Saturday, three workers to work from Thursday to Monday and one worker to work from Saturday to Wednesday.
+
+Working from Monday to Friday is the most popular pattern (lowest cost, highest demand). 
+
+
+
+
+
