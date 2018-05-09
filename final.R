@@ -1,7 +1,6 @@
 ###Optimization Final Review###
 
 #########################
-
 #1.Linear Programming
 library('lpSolve')
 
@@ -377,6 +376,7 @@ print(paste("Prob. of winning if we switch doors       :", mean(swit)))
 
 #########################
 
+#6.Dynamic Programming
 
 price = 1
 M=100
